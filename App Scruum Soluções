@@ -1,0 +1,351 @@
+import PySimpleGUI as sg
+import pywhatkit as kit
+import pyautogui
+import time
+from pdb import set_trace
+
+import mysql.connector
+
+pyautogui.KEYBOARD_KEYS
+
+
+#import tkinter as tk
+
+#app = tk.Tk()
+
+#app.geometry('200x200')
+#app.resizable(width=None, height=None)
+
+#app.mainloop()
+
+
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="Rafael",
+    password="EuvouPassar3975.128",
+    database="base_telefones"
+)
+mycursor = mydb.cursor()
+
+def _consulta_usuarios():
+    mycursor.execute("SELECT * FROM base_telefones.usuarios")
+    myresult = mycursor.fetchall()
+    return myresult
+
+def _inserir_mensagem(num_telefone, mensagem_texto):
+    mycursor.execute(
+        "INSERT INTO base_telefones.table_telefones"
+        "  (numero_tel, texto_mensagem)"
+        "  VALUES ("
+        f"     '{num_telefone}',"
+        f"     '{mensagem_texto}'"
+        "  )"
+    )
+    mydb.commit()
+    return mycursor.rowcount
+
+def _cadastrar_usuario(nome_usuario, tel_usuario, senha_usuario):
+    mycursor.execute(
+        "INSERT INTO base_telefones.usuarios"
+        "  (nome_usuario, tel_usuario, senha)"
+        "  VALUES ("
+        f"     '{nome_usuario}',"
+        f"     '{tel_usuario}',"
+        f"     '{senha_usuario}'"
+        "  )"
+    )
+    mydb.commit()
+    return mycursor.rowcount
+
+#Criar as janelas e estilos (layout)
+def janela_login():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('   '), sg.Image(r'C:\Users\Lenovo\Desktop\Arquivos\ES.PNG')],
+        [sg.Text('Usuário'), sg.Input(key='usuario')],
+        [sg.Text('Senha  '), sg.Input(key='senha', password_char='*')],
+        [sg.Button('Cadastrar Usuário')],
+        [sg.Button('Entrar')]
+]
+    return sg.Window('Entrar', layout=layout, finalize=True, resizable=True)
+def janela_cadastro():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('Digite o nome    '), sg.Input(key='usuario_cadastro')],
+        [sg.Text('Digite o telefone'), sg.Input(key='telefone_usuario')],
+        [sg.Text('Crie uma senha'), sg.Input(key='senha_cadastro')],
+        [sg.Text('                             '), sg.Button('Cadastrar'), sg.Text('   '), sg.Button('   Voltar   ')]
+]
+    return sg.Window('Cadastrar Usuário', layout=layout, finalize=True, resizable=True)
+def janela_menu():
+    sg.theme('Reddit')
+    layout = [
+       # [sg.Text('Menu')],
+        [sg.Button('Enviar Mensagem')],
+        [sg.Button('Mensagens Recebidas'), sg.Button('Mensagens Enviadas')],
+        [sg.Button('Voltar')]
+    ]
+    return sg.Window('Menu', layout=layout, finalize=True, resizable=True)
+def janela_Mensagem():
+    sg.theme('Reddit')
+    layout = [
+        #[sg.Text('UF '), sg.Input(key='UF')],
+        [sg.Text('Telefone '), sg.Input(key='Telefone')],
+        [sg.Text('Mensagem '), sg.Input(key='Mensagem')],
+        [sg.Button('Voltar'), sg.Button('Enviar')]
+    ]
+    return sg.Window('Enviar Mensagem', layout=layout, finalize=True, resizable=True)
+def janela_Confirmacao():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('Mensagem Enviada!')],
+        [sg.Button('OK')]
+    ]
+    return sg.Window('OK', layout=layout, finalize=True, resizable=True)
+def janela_Recebidas():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('AQUI FICARÃO TODAS AS MENSAGENS RECEBIDAS NO WHATSAPP EMPRESARIAL')],
+        [sg.Input()],
+        [sg.Button('Voltar')]
+    ]
+    return sg.Window('Mensagens Recebidas', layout=layout, finalize=True, resizable=True)
+def janela_Enviadas():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('AQUI FICARÃO TODAS AS MENSAGENS ENVIADAS NO WHATSAPP EMPRESARIAL')],
+        [sg.Input()],
+        [sg.Button('Voltar')]
+    ]
+    return sg.Window('Mensagens Enviadas', layout=layout, finalize=True, resizable=True)
+def janela_Negado():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('Acesso Negado!')]
+    ]
+    return sg.Window('Acesso Negado', layout=layout, finalize=True)
+def janela_Vazio():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('Adicione Usuário e/ou Senha!')]
+    ]
+    return sg.Window('Campos Vazios!', layout=layout, finalize=True)
+def janela_cadastroOK():
+    sg.theme('Reddit')
+    layout = [
+        [sg.Text('Cadastro realizado com sucesso!')]
+    ]
+    return sg.Window('Confirmação', layout=layout, finalize=True)
+#criar as janelas iniciais
+janela1,janela2,janela3,janela4, janela5, janela6, janela7, janela8, janela9, janela10 = janela_login(), None, None, None, None, None, None, None, None, None
+
+#criar um loop de leitura de eventos
+while True:
+    usuarios = _consulta_usuarios()
+
+    window,event,values = sg.read_all_windows()
+    #Quando a janela for fechada
+    if window == janela1 and event == sg.WIN_CLOSED:
+        break
+    if window == janela2 and event == sg.WIN_CLOSED:
+        break
+    if window == janela3 and event == sg.WIN_CLOSED:
+        break
+    if window == janela4 and event == sg.WIN_CLOSED:
+        break
+    if window == janela5 and event == sg.WIN_CLOSED:
+        break
+    if window == janela6 and event == sg.WIN_CLOSED:
+        break
+    if window == janela7 and event == sg.WIN_CLOSED:
+        janela7.hide()
+        janela1.un_hide()
+    if window == janela8 and event == sg.WIN_CLOSED:
+        janela8.hide()
+        janela1.un_hide()
+    if window == janela9 and event == sg.WIN_CLOSED:
+        break
+    if window == janela10 and event == sg.WIN_CLOSED:
+        break
+
+    #Quando queremos ir para a próxima janela
+    #Indo da janela 1 para a 2
+    ##if window == janela1 and event == 'Entrar':
+        #Entrar na janela segunda e esconder a primeira
+        ##janela2 = janela_menu()
+        ##janela1.hide()
+#Verificando se o usuario e senha do usuário cadastrado estão batendo:
+    #Pondo banco de dados simples e uso de if else (Login):
+    if window == janela1 and event == 'Entrar':
+        nome_usuario = values['usuario']
+        senha_usuario = values['senha']
+        autenticado = False
+        for usuario in usuarios:
+            if nome_usuario == usuario[1] and senha_usuario == usuario[3]:
+                janela2 = janela_menu()
+                janela1.hide()
+                autenticado = True
+        if not autenticado:
+            if values['usuario'] == '' and values['senha'] == '':
+                janela8 = janela_Vazio()
+            else:
+                janela7 = janela_Negado()
+
+
+
+        # if (
+        #     values['usuario'] == 'Rafael'
+        #     and values['senha'] == '3975'
+        #     or values['usuario'] == 'Ronny'
+        #     and values['senha'] == '1'
+        #     or values['usuario'] == 'Victor'
+        #     and values['senha'] == '1'
+        #     or values['usuario'] == 'Thiago'
+        #     and values['senha'] == '1'
+        #     or values['usuario'] == 'Mauro'
+        #     and values['senha'] == '1'
+        #     or values['usuario'] == 'Larissa'
+        #     and values['senha'] == '1'
+        #     or values['usuario'] == 'Glênio'
+        #     and values['senha'] == '1'
+        #     or values['usuario'] == 'Starling'
+        #     and values['senha'] == '1'
+        #     or values['usuario'] == 'Scruum'
+        #     and values['senha'] == '1'
+        # ):
+        #     janela2 = janela_menu()
+        #     janela1.hide()
+        # else:
+        #     if values['usuario'] == '' and values['senha'] == '':
+        #         janela8 = janela_Vazio()
+        #     else:
+        #         janela7 = janela_Negado()
+
+    #Pondo funções para o whatsaap
+
+
+
+    if window == janela2 and event == 'Voltar':
+        #Voltar para a janela primeira e esconder a segunda
+        janela2.hide()
+        janela1.un_hide()
+
+    #Indo da janela 2 para 3
+    if window == janela2 and event == 'Enviar Mensagem':
+        #Entrar na janela terceira e esconder a segunda
+        janela3 = janela_Mensagem()
+        janela2.hide()
+            #if values['UF'] == 'AC' or values['UF'] == 'AL' or values['UF'] == 'AP' or values['UF'] == 'AM' or values['UF'] == 'BA' or values['UF'] == 'CE' or values['UF'] == 'ES' or values['UF'] == 'GO' or values['UF'] == 'MT' or values['UF'] == 'MS' or values['UF'] == 'MG' or values['UF'] == 'PA' or values['UF'] == 'PB' or values['UF'] == 'PR' or values['UF'] == 'PE' or values['UF'] == 'PI' or values['UF'] == 'RJ' or values['UF'] == 'RN' or values['UF'] == 'RS' or values['UF'] == 'RO' or values['UF'] == 'RR' or values['UF'] == 'SC' or values['UF'] == 'SP' or values['UF'] == 'SE' or values['UF'] == 'TO' or values['UF'] == 'DF' and values == ''
+            #kit.sendwhatmsg_instantly(cliente, usuario + ": " + mensagem)
+
+    #Indo para janela 9 de cadastro:
+    if window == janela1 and event == 'Cadastrar Usuário':
+        janela9 = janela_cadastro()
+        janela1.hide()
+    #Voltar para janela 1 login:
+    if window == janela9 and event == '   Voltar   ':
+        janela9.hide()
+        janela1.un_hide()
+    if window == janela9 and event == 'Cadastrar':
+        #nome_usuario = values['usuario']
+        #senha_usuario = values['senha']
+        janela10 = janela_cadastroOK()
+        nome_usuario = values['usuario_cadastro']
+        tel_usuario = values['telefone_usuario']
+        senha_usuario = values['senha_cadastro']
+        _cadastrar_usuario(nome_usuario, tel_usuario, senha_usuario)
+        janela10.hide()
+        janela9.un_hide()
+    # Indo da janela 2 para 3
+
+    if window == janela3 and event == 'Voltar':
+        janela3.hide()
+        janela2.un_hide()
+    # Indo da janela 3 para 4
+    # Pondo funcionalidade para o envio de mensagens:########################################################
+    if window == janela3 and event == 'Enviar':
+        # Acessar values['UF'], values['Telefone'], values['Mensagem']
+        # set_trace() ----------------------------------BREAK POINT
+    #    kit.sendwhatmsg_instantly('Telefone','Mensagem')
+        num_telefone = values['Telefone']
+        mensagem_texto = values['Mensagem']
+        _inserir_mensagem(num_telefone, mensagem_texto)
+        # Inserir
+        janela4 = janela_Confirmacao()
+        janela3.hide()
+
+#Telefone=values['Telefone']
+#Mensagem=values['Mensagem']
+
+
+        # Utiliza a pywhatkit (WhatsApp):
+        #Se ao por o +55 na frente, adiciona o numero, se não, já adiciona o +55 automaticamente.
+        
+        if values['Telefone'] and values['Mensagem']:
+            if '+55' in values['Telefone']:
+                num_telefone = values['Telefone']
+            else:
+                num_telefone = f"+55{values['Telefone']}"
+            kit.sendwhatmsg_instantly(
+                num_telefone,
+                values['Mensagem'],
+                10,
+                tab_close=True,
+                close_time=15,
+            )
+
+            
+    #Voltando da janela 4 para 3
+    if window == janela4 and event == 'OK':
+        janela4.hide()
+        janela3.un_hide()
+    # Indo da janela 3 para 5
+    if window == janela2 and event == 'Mensagens Recebidas':
+        janela5 = janela_Recebidas()
+        janela2.hide()
+    # Voltando da janela 5 para 3
+    if window == janela5 and event == 'Voltar':
+        janela5.hide()
+        janela2.un_hide()
+    # Indo da janela 2 para 6
+    if window == janela2 and event == 'Mensagens Enviadas':
+        janela6 = janela_Enviadas()
+        janela2.hide()
+    # Voltando da janela 6 para 2
+    if window == janela6 and event == 'Voltar':
+        janela6.hide()
+        janela2.un_hide()
+    #Quando queremos voltar para a janela anterior
+#lógica de o que deve acontecer ao clicar nos botões
+
+# Layout
+##sg.theme('Green')
+##layout = [
+##    [sg.Image(r'C:\Users\Lenovo\Desktop\Arquivos\Emblema Scruumgg.PNG')],
+##    [sg.Text('Usuário'), sg.Input(key='usuario')],
+##    [sg.Text('Senha'), sg.Input(key='senha', password_char='*')],
+##    [sg.Checkbox('Salvar o login?')],
+##    [sg.Button('Entrar')]
+##]
+
+#sg.theme('Blue')
+#layout = [
+#   [sg.Text('Acesso Liberado!')],
+#    [sg.Button('OK')]
+#]
+
+# Janela
+##janela = sg.Window('Whatsapp Scruum Soluções Inteligentes', layout)
+
+#janela1 = sg.Window('Acesso Liberado', layout)
+
+# Ler os eventos
+##while True:
+##    eventos, valores = janela.read()
+##    if eventos == sg.WINDOW_CLOSED:
+##        break
+##    if eventos == 'Entrar':
+##        if valores['usuario'] == 'Rafael Souza' and valores['senha'] == '3975':
+##            print('Acesso Liberado!')
+
+#print()
